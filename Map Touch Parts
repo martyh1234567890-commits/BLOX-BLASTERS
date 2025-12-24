@@ -1,0 +1,170 @@
+local gamePassId = 21581456 --This is our game pass id for "2x Vote"
+local MPS = game:GetService("MarketplaceService")
+
+for i,part in pairs(script.Parent:GetChildren()) do --reapet the following commands until it reaches the final child, part is the selected child
+	if(part:IsA("Part")) then --If it's a part and not anything else
+		part.Touched:Connect(function(hit) -- every time the part gets touched, run the following commands:
+			if(game:GetService("ReplicatedStorage").MapTime.Value == true) then -- If it's the time to choose the map.
+				if(game:GetService("Players"):GetPlayerFromCharacter(hit.Parent)) then --if the hit is a part of a player character then
+					local player = game:GetService("Players"):GetPlayerFromCharacter(hit.Parent) -- gets the player from his character
+					if (MPS:UserOwnsGamePassAsync(player.UserId, gamePassId)) then --If the player that touched the map voting block, check if he has the gamepass
+						if(part.Name == "Map1") then -- if the part's name is Map1
+						if(player.MapChosen.Value == "Map1") then --if the player has already chose this map
+							-- do nothing
+						elseif(player.MapChosen.Value == "Map2") then --if the player has chosen map2
+							player.MapChosen.Value = "Map1" -- change the selected map
+							workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value - 2 --decrease the other map's votes
+							workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value + 2 --increase the this map's votes
+						elseif(player.MapChosen.Value == "Map3") then --if the player has chosen map2
+							player.MapChosen.Value = "Map1" -- change the selected map
+							workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value - 2 --decrease the other map's votes
+							workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value + 2 --increase the this map's votes
+						elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+							player.MapChosen.Value = "Map1" -- change the selected map
+							workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value + 2 --increase the this map's votes
+						end
+						--now the same for map 2
+					elseif(part.Name == "Map2") then -- if the part's name is Map2
+						if(player.MapChosen.Value == "Map2") then --if the player has already chose this map
+							-- do nothing
+						elseif(player.MapChosen.Value == "Map1") then --if the player has chosen map2
+							player.MapChosen.Value = "Map2" -- change the selected map
+							workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value + 2 --increase this map's votes
+							workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value - 2 --decrease the other map's votes
+						elseif(player.MapChosen.Value == "Map3") then --if the player has chosen map2
+							player.MapChosen.Value = "Map2" -- change the selected map
+							workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value - 2 --decrease the other map's votes
+							workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value + 2 --increase the this map's votes
+						elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+							player.MapChosen.Value = "Map2" -- change the selected map
+							workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value + 2 --increase the this map's votes
+						end
+						--now for the last map
+					elseif(part.Name == "Map3") then -- if the part's name is Map3
+						if(player.MapChosen.Value == "Map3") then --if the player has already chose this map
+							-- do nothing
+						elseif(player.MapChosen.Value == "Map1") then --if the player has chosen map2
+							player.MapChosen.Value = "Map3" -- change the selected map
+							workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value + 2 --increase this map's votes
+							workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value - 2 --decrease the other map's votes
+						elseif(player.MapChosen.Value == "Map2") then --if the player has chosen map2
+							player.MapChosen.Value = "Map3" -- change the selected map
+							workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value - 2 --decrease the other map's votes
+							workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value + 2 --increase the this map's votes
+						elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+							player.MapChosen.Value = "Map3" -- change the selected map
+							workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value + 2 --increase the this map's votes
+						end
+					elseif(part.Name == "Map4") then -- if the part's name is Map4
+						if(player.MapChosen.Value == "Map4") then --if the player has already chose this map
+							-- do nothing
+						elseif(player.MapChosen.Value == "Map1") then --if the player has chosen map2
+							player.MapChosen.Value = "Map4" -- change the selected map
+							workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 2 --increase this map's votes
+							workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value - 2 --decrease the other map's votes
+						elseif(player.MapChosen.Value == "Map2") then --if the player has chosen map2
+							player.MapChosen.Value = "Map4" -- change the selected map
+							workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value - 2 --decrease the other map's votes
+							workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 2 --increase the this map's votes
+						elseif(player.MapChosen.Value == "Map3") then --if the player has chosen map2
+							player.MapChosen.Value = "Map4" -- change the selected map
+							workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value - 2 --decrease the other map's votes
+							workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 2 --increase the this map's votes
+						elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+							player.MapChosen.Value = "Map4" -- change the selected map
+							workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 2 --increase the this map's votes
+						end
+					end
+					
+					else --If the player does not have the gamepass then
+						if(part.Name == "Map1") then -- if the part's name is Map1
+							if(player.MapChosen.Value == "Map1") then --if the player has already chose this map
+								-- do nothing
+							elseif(player.MapChosen.Value == "Map2") then --if the player has chosen map2
+								player.MapChosen.Value = "Map1" -- change the selected map
+								workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value + 1 --increase the this map's votes
+							elseif(player.MapChosen.Value == "Map3") then --if the player has chosen map2
+								player.MapChosen.Value = "Map1" -- change the selected map
+								workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value + 1 --increase the this map's votes
+								
+							elseif(player.MapChosen.Value == "Map4") then --if the player has chosen map2
+								player.MapChosen.Value = "Map1" -- change the selected map
+								workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value + 1 --increase the this map's votes
+								
+							elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+								player.MapChosen.Value = "Map1" -- change the selected map
+								workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value + 1 --increase the this map's votes
+							end
+							--now the same for map 2
+						elseif(part.Name == "Map2") then -- if the part's name is Map2
+							if(player.MapChosen.Value == "Map2") then --if the player has already chose this map
+								-- do nothing
+							elseif(player.MapChosen.Value == "Map1") then --if the player has chosen map2
+								player.MapChosen.Value = "Map2" -- change the selected map
+								workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value + 1 --increase this map's votes
+								workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value - 1 --decrease the other map's votes
+							elseif(player.MapChosen.Value == "Map3") then --if the player has chosen map2
+								player.MapChosen.Value = "Map2" -- change the selected map
+								workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value + 1 --increase the this map's votes
+								
+							elseif(player.MapChosen.Value == "Map4") then --if the player has chosen map2
+								player.MapChosen.Value = "Map2" -- change the selected map
+								workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value + 1 --increase the this map's votes
+								
+							elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+								player.MapChosen.Value = "Map2" -- change the selected map
+								workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value + 1 --increase the this map's votes
+							end
+							--now for the last map
+						elseif(part.Name == "Map3") then -- if the part's name is Map3
+							if(player.MapChosen.Value == "Map3") then --if the player has already chose this map
+								-- do nothing
+							elseif(player.MapChosen.Value == "Map1") then --if the player has chosen map2
+								player.MapChosen.Value = "Map3" -- change the selected map
+								workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value + 1 --increase this map's votes
+								workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value - 1 --decrease the other map's votes
+							elseif(player.MapChosen.Value == "Map2") then --if the player has chosen map2
+								player.MapChosen.Value = "Map3" -- change the selected map
+								workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value + 1 --increase the this map's votes
+								
+							elseif(player.MapChosen.Value == "Map4") then --if the player has chosen map2
+								player.MapChosen.Value = "Map3" -- change the selected map
+								workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value + 1 --increase the this map's votes
+								
+							elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+								player.MapChosen.Value = "Map3" -- change the selected map
+								workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value + 1 --increase the this map's votes
+							end
+						elseif(part.Name == "Map4") then -- if the part's name is Map4
+							if(player.MapChosen.Value == "Map4") then --if the player has already chose this map
+								-- do nothing
+							elseif(player.MapChosen.Value == "Map1") then --if the player has chosen map2
+								player.MapChosen.Value = "Map4" -- change the selected map
+								workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 1 --increase this map's votes
+								workspace.MapValues.Map1.Value = workspace.MapValues.Map1.Value - 1 --decrease the other map's votes
+							elseif(player.MapChosen.Value == "Map2") then --if the player has chosen map2
+								player.MapChosen.Value = "Map4" -- change the selected map
+								workspace.MapValues.Map2.Value = workspace.MapValues.Map2.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 1 --increase the this map's votes
+							elseif(player.MapChosen.Value == "Map3") then --if the player has chosen map2
+								player.MapChosen.Value = "Map4" -- change the selected map
+								workspace.MapValues.Map3.Value = workspace.MapValues.Map3.Value - 1 --decrease the other map's votes
+								workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 1 --increase the this map's votes
+							elseif(player.MapChosen.Value == "") then --if the player did not choose yet.
+								player.MapChosen.Value = "Map4" -- change the selected map
+								workspace.MapValues.Map4.Value = workspace.MapValues.Map4.Value + 1 --increase the this map's votes
+							end
+						end
+					end	
+				end
+			end
+		end)
+	end
+end
