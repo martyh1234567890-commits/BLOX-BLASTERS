@@ -1,0 +1,18 @@
+local updateLoadingTextEvent = Instance.new("RemoteEvent")
+updateLoadingTextEvent.Name = "UpdateLoadingTextEvent"
+updateLoadingTextEvent.Parent = game:GetService("ReplicatedStorage")
+
+updateLoadingTextEvent.OnServerEvent:Connect(function(player, text)
+	print(text)
+end)
+
+while true do
+	updateLoadingTextEvent:FireAllClients("Loading")
+	wait(0.25)
+	updateLoadingTextEvent:FireAllClients("Loading.")
+	wait(0.25)
+	updateLoadingTextEvent:FireAllClients("Loading..")
+	wait(0.25)
+	updateLoadingTextEvent:FireAllClients("Loading...")
+	wait(0.25)
+end
