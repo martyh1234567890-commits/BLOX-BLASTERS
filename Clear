@@ -1,0 +1,3 @@
+game:GetService("ReplicatedStorage").ClearChosen.OnServerEvent:Connect(function(plr)
+	plr.MapChosen.Value = ""
+end)
