@@ -1,0 +1,365 @@
+--//Variables
+local MapLabels = workspace:WaitForChild("MapLabels")
+local MapValues = workspace:WaitForChild("MapValues")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Intermission = ReplicatedStorage:WaitForChild("Text")
+local KillText = ReplicatedStorage:WaitForChild("Text2")
+local MapTime = ReplicatedStorage:WaitForChild("MapTime")
+local AccessibleMaps = ReplicatedStorage:WaitForChild("AccessibleMaps")
+local ClearEvent = ReplicatedStorage:WaitForChild("ClearChosen")
+local AddImages = ReplicatedStorage:WaitForChild("AddImages")
+local MapsFolder = game:GetService("ServerStorage").Maps
+local Maps = MapsFolder:GetChildren()
+local CurrentMap
+local WinSound = game.Workspace.victory
+local DeathSound = game.Workspace.BulletImpact6
+local ResetPart = game.Workspace.KILLPART
+local StarterGui = game:GetService("StarterGui")
+
+--//Variable Numbers
+local MapChooseLength = 15
+local IntermissionLength = 20 
+local GameLength = 250 
+local reward = 1 
+local mode = 1
+
+--//Variable Tables
+local randomMaps = {}
+local cons = {}
+
+--//Clearing Votes
+local function ClearVotes()
+	MapValues.Map1.Value = 0
+	MapValues.Map2.Value = 0
+	MapValues.Map3.Value = 0
+	MapValues.Map4.Value = 0
+end
+
+--//Entire Game Loop
+while true do 
+	if(#game:GetService("Players"):GetPlayers() >= 2) then 
+		
+		--//Game Loop Begins 
+		for i = IntermissionLength,0,-1 do 
+			Intermission.Value = "Intermission "..i 
+			wait(1)
+		end
+				
+		local plrs = {}
+		for i, player in pairs(game.Players:GetPlayers()) do
+			if player then
+				table.insert(plrs,player)
+			end
+		end
+		
+		local mapFolder = {}
+		ResetPart.BadgeGiver.Disabled = true
+		
+		--//Choosing 4 Random Maps for Voting
+		repeat
+			randomMaps[1] = Maps[math.random(1, #Maps)]
+			randomMaps[2] = Maps[math.random(1, #Maps)]
+			randomMaps[3] = Maps[math.random(1, #Maps)]
+			randomMaps[4] = Maps[math.random(1, #Maps)]
+		until randomMaps[1] ~= randomMaps[2] and randomMaps[2] ~= randomMaps[3] and randomMaps[3] ~= randomMaps[4] and randomMaps[1] ~= randomMaps[4] and randomMaps[2] ~= randomMaps[4] and randomMaps[1] ~= randomMaps[3]
+
+		print("Random maps chosen:")
+		print("Map 1:", randomMaps[1].Name)
+		print("Map 2:", randomMaps[2].Name)
+		print("Map 3:", randomMaps[3].Name)
+		print("Map 4:", randomMaps[4].Name)
+		game.Workspace.KILLPART.Code.Enabled = false
+		
+		--//Loading Screen ON
+		StarterGui.LoadingScreen.Gui.Visible = true
+
+		--//Configuring ViewportFrame
+		MapTime.Value = true 
+		for i = 1, 4 do
+			randomMaps[i] = randomMaps[i]:Clone()
+			randomMaps[i].Parent = AccessibleMaps
+			mapFolder["Map" .. i] = randomMaps[i]
+			AddImages:FireAllClients(randomMaps[i], i)
+		end
+
+		for i, v in pairs(MapLabels:GetChildren()) do
+			local mapValue = MapValues:FindFirstChild(v.Name)
+			if mapValue then
+				v:WaitForChild("SurfaceGui")[v.Name].Text = mapFolder[v.Name].Name .. " Votes: 0" 
+				cons[i] = mapValue:GetPropertyChangedSignal("Value"):Connect(function() 
+					v:WaitForChild("SurfaceGui")[v.Name].Text = mapFolder[v.Name].Name .. " Votes: " .. mapValue.Value
+				end)
+			end
+		end
+		wait(5)
+		
+		--//Loading Screen OFF
+		StarterGui.LoadingScreen.Gui.Visible = false
+		
+		--//Map Voting
+		for i = MapChooseLength, 0, -1 do 
+			Intermission.Value = "You have " .. i .. " seconds to choose a map!" 
+			wait(1)
+		end
+
+		for i, v in ipairs(cons) do
+			if v then
+				v:Disconnect() 
+			end
+		end
+		wait(2)
+		
+
+		--//Map Voting System
+		if(workspace.MapValues.Map1.Value > workspace.MapValues.Map2.Value and workspace.MapValues.Map1.Value > workspace.MapValues.Map3.Value) then 
+			--//Map1 has won
+			Intermission.Value = randomMaps[1].Name.. " was chosen"
+			print("Map 1 has won!")
+			ClearVotes()
+			ClearEvent:FireAllClients()
+			CurrentMap = randomMaps[1]:Clone() 
+
+		elseif(workspace.MapValues.Map2.Value > workspace.MapValues.Map1.Value and workspace.MapValues.Map2.Value > workspace.MapValues.Map3.Value) then 
+			--//Map2 has won    
+			Intermission.Value = randomMaps[2].Name.. " was chosen"
+			print("Map 2 has won!")
+			ClearVotes()
+			ClearEvent:FireAllClients()
+			CurrentMap = randomMaps[2]:Clone() 
+
+		elseif(workspace.MapValues.Map3.Value > workspace.MapValues.Map1.Value and workspace.MapValues.Map3.Value > workspace.MapValues.Map1.Value) then
+			--//Map3 has won    
+			Intermission.Value = randomMaps[3].Name.. " was chosen"
+			print("Map 3 has won!")
+			ClearVotes()
+			ClearEvent:FireAllClients()
+			CurrentMap = randomMaps[3]:Clone() 
+
+		elseif(workspace.MapValues.Map4.Value > workspace.MapValues.Map1.Value and workspace.MapValues.Map4.Value > workspace.MapValues.Map2.Value and workspace.MapValues.Map4.Value > workspace.MapValues.Map3.Value) then 
+			--//Map4 has won
+			Intermission.Value = randomMaps[4].Name.. " was chosen"
+			print("Map 4 has won!")
+			ClearVotes()
+			ClearEvent:FireAllClients()
+			CurrentMap = randomMaps[4]:Clone() 
+		elseif(workspace.MapValues.Map3.Value == 0 and workspace.MapValues.Map2.Value == 0 and workspace.MapValues.Map1.Value == 0) then 
+			--//No Map has won
+			Intermission.Value = "No one chose, choosing random!"
+			ClearVotes()
+
+			local mapChosen = math.random(1,4)
+
+			if(mapChosen == 1) then
+				Intermission.Value = randomMaps[1].Name.. " was chosen"
+				CurrentMap = randomMaps[1]:Clone()
+
+			elseif(mapChosen == 2) then
+				Intermission.Value = randomMaps[2].Name.. " was chosen"
+				CurrentMap = randomMaps[2]:Clone()
+
+			elseif(mapChosen == 3) then
+				Intermission.Value = randomMaps[3].Name.. " was chosen"
+				CurrentMap = randomMaps[3]:Clone()
+			elseif(mapChosen == 4) then
+				Intermission.Value = randomMaps[4].Name.. " was chosen"
+				CurrentMap = randomMaps[4]:Clone()
+			end
+		else
+			local mapChosen = math.random(1,4)
+			Intermission.Value = "There's a tie, choosing random!"
+			wait(2)
+
+			if(mapChosen == 1) then
+				ClearVotes()
+				Intermission.Value = randomMaps[1].Name.. " was chosen!"
+				CurrentMap = randomMaps[1]:Clone() 
+
+			elseif(mapChosen == 2) then
+				Intermission.Value = randomMaps[2].Name.. " was chosen!"
+				CurrentMap = randomMaps[2]:Clone() 
+
+			elseif(mapChosen == 3) then
+				Intermission.Value = randomMaps[3].Name.. " was chosen!"
+				CurrentMap = randomMaps[3]:Clone()
+			elseif(mapChosen == 4) then
+				Intermission.Value = randomMaps[4].Name.. " was chosen!"
+				CurrentMap = randomMaps[4]:Clone()
+			end
+		end
+		MapTime.Value = false 
+		wait(1)
+
+		--//Loading Screen ON
+		StarterGui.LoadingScreen.Gui.Visible = true
+		
+		--//Preparing the Round
+		CurrentMap.Parent = workspace
+		print("Current map:", CurrentMap.Name)
+		wait(5)
+		local RanWeaponFolder = game.ServerStorage:WaitForChild("RanWeapon")
+
+		for i, player in pairs(plrs) do
+			if player then
+				local character = player.Character
+				if character then
+					local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+					-- Teleport player to spawn point
+					humanoidRootPart.CFrame = CurrentMap.SpawnPoint.CFrame + Vector3.new(0, 10, 0)
+
+					-- Give the player a random weapon
+					local weapons = RanWeaponFolder:GetChildren()
+					if #weapons > 0 then
+						local randomWeapon = weapons[math.random(1, #weapons)]:Clone()
+						randomWeapon.Parent = player.Backpack
+
+						-- Add a GameTag to the player's character
+						local gameTag = Instance.new("BoolValue")
+						gameTag.Name = "GameTag"
+						gameTag.Parent = character
+					else
+						warn("No weapons found in RanWeapon folder.")
+					end
+				else
+					table.remove(plrs, i)
+				end
+			end
+		end
+		
+		--//Loading Screen OFF
+		StarterGui.LoadingScreen.Gui.Visible = false
+		
+		Intermission.Value = "Get ready to play!"
+		print("Round starts")
+		wait(1)
+		
+		--//Game Round
+		for i = GameLength,0,-1 do 
+			print("Game time remaining:", i, "seconds")
+			for x, player  in pairs(plrs) do
+				if player then
+					character = player.Character
+					if not character then
+						--// Left the game
+						table.remove(plrs,x)
+					else
+						if character:FindFirstChild("GameTag") then
+							--// They are still alive
+							print(player.Name.." is still in the game!")
+						else
+							--// They are dead
+							table.remove(plrs,x)
+							print(player.Name.." has been removed!")
+							KillText.Value = "❌ " .. player.Name .. " has been killed!"
+							DeathSound:Play()
+							wait(2)
+						end
+					end
+				else
+					table.remove(plrs,x)
+					print(player.Name.." has been removed!") 
+				end
+			end
+			
+			--//Loading Screen OFF (in case)
+			StarterGui.LoadingScreen.Gui.Visible = false
+			
+			--//Main Game Information
+			Intermission.Value = "🕓 = "..i.." / 👤 = "..#plrs 
+			KillText.Value = ""
+			
+			--//XRay Mode
+			if i == 120 then
+				print("Last Minute!")
+				if mode == 1 then
+					local d = game.Players:GetChildren()
+					for i = 1, #d do		
+						if not d[i].Character:FindFirstChild("XrayHighlight") then			
+							script.XrayHighlight:Clone().Parent = d[i].Character
+							d[i].Character.XrayHighlight.Enabled = true
+							mode = 1
+							KillText.Value = "☢️ X-Ray Mode ON ☢️"
+							print("XRAY MODE ON!")
+							wait(1.5)
+						end
+					end
+				end											
+			end
+			
+			--//Game Round Endings
+			if #plrs == 1 then
+				wait(3)
+				Intermission.Value = "The winner is "..plrs[1].Name.." 🏆"
+				print("The winner is:", plrs[1].Name)
+				plrs[1].leaderstats.Wins.Value = plrs[1].leaderstats.Wins.Value + reward
+				ResetPart.BadgeGiver.Disabled = false
+				WinSound:Play()
+				wait(1)
+				CurrentMap:Destroy()
+				CurrentMap = nil 	
+				ResetPart.BadgeGiver.Disabled = true
+				wait(2)
+				
+				local winner = plrs[1]
+				local character = winner.Character
+				
+				if character then
+					local humanoid = character:FindFirstChild("Humanoid")
+					if humanoid then
+						humanoid.Health = 0
+						wait(0.1)
+						humanoid.Health = 0
+					end
+				end
+				break
+			elseif #plrs == 0 or nil then
+				Intermission = "Nobody won! 🤷"
+				print("Nobody won!")
+				wait(3)
+				CurrentMap:Destroy()
+				CurrentMap = nil 	
+				ResetPart.Code.Enabled = true
+				break
+			elseif i == 0 then
+				Intermission.Value = "Times up! ⏰"
+				print("Time's up!")
+				wait(3)
+				CurrentMap:Destroy()
+				CurrentMap = nil 	
+				ResetPart.Code.Enabled = true
+				break
+			end
+			KillText.Value = ""
+			wait(1)
+		end
+		
+		wait(0.2)
+		Intermission.Value = "Game Ended!"
+		print("Game Round ended.")
+		game.Workspace.KILLPART.Code.Enabled = false
+
+		--//XRay Mode
+		if mode == 1 then
+			local d = game.Players:GetChildren()
+			for i = 1, #d do
+				if d[i].Character:FindFirstChild("XrayHighlight") then
+					print("XRay highlight found on:", d[i].Name)
+					d[i].Character.XrayHighlight:Destroy()
+					mode = 1
+					print("XRAY MODE OFF!")
+				end
+			end
+		end		
+		
+		wait(3)
+		Intermission.Value = "Reseting players for next round..."
+		ResetPart.Code.Disabled = false
+		wait(3.75)
+		print("End of the loop iteration.")
+	else
+		Intermission.Value = "Waiting for Enough Players...😭"
+		KillText.Value = ""
+		wait()
+	end
+	wait()
+end
