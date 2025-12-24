@@ -1,0 +1,17 @@
+local GamepassId = 21581115
+
+game:GetService("MarketplaceService").PromptGamePassPurchaseFinished:Connect(function(plr,ido,purchased)
+	if purchased and ido == GamepassId then
+		plr.Character.Humanoid.MaxHealth = 110     
+		plr.Character.Humanoid.Health = 110
+	end
+end)
+
+game.Players.PlayerAdded:Connect(function(plr)
+	plr.CharacterAdded:connect(function(char)
+		if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(game.Players[char.Name].UserId, GamepassId) then         
+			char.Humanoid.MaxHealth = 110
+			char.Humanoid.Health = 110
+		end
+	end)
+end)
