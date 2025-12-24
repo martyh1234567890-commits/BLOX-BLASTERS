@@ -1,0 +1,79 @@
+local toolFolder = game.ServerStorage.AdminTools
+local adminUserIds = {
+	1514853557, --//MarekCZ010
+	1150224282, --//romancz05
+	1079714550, --//lolmanssssssssss
+	4600101683, --//Mart_Hdk
+	--//Add more UserIDs here
+	-1, --//Player1
+	-2, --//Player2
+}
+
+--//Admin Giving Tools
+local function giveTool(player, playerName, toolName)
+	if table.find(adminUserIds, player.UserId) then
+		local targetPlayer = game.Players:FindFirstChild(playerName)
+		if targetPlayer then
+			local tool = toolFolder:FindFirstChild(toolName)
+			if tool then
+				tool:Clone().Parent = targetPlayer.Backpack
+			else
+				print("Invalid tool name:", toolName)
+			end
+		else
+			print("Player not found:", playerName)
+		end
+	else
+		print("You are not authorized to use this command.")
+	end
+end
+game.ServerStorage.AdminTools.ChildAdded:Connect(function(newTool)
+	newTool.Parent = nil
+end)
+game.Players.PlayerAdded:Connect(function(player)
+	player.Chatted:Connect(function(message)
+		local parts = string.split(message, " ")
+		if #parts == 3 and parts[1] == "/give" then
+			local playerName = parts[2]
+			local toolName = parts[3]
+			giveTool(player, playerName, toolName)
+		end
+	end)
+end)
+
+--//Teleporting
+local function teleportPlayerToPart(admin, playerName, partName)
+	local targetPlayer = game.Players:FindFirstChild(playerName)
+	if targetPlayer then
+		local part = workspace.AdminTeleport:FindFirstChild(partName)
+		if part then
+			local character = targetPlayer.Character
+			if character then
+				local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+				if humanoidRootPart then
+					humanoidRootPart.CFrame = part.CFrame
+				end
+			end
+		else
+			warn("Part not found:", partName)
+		end
+	else
+		warn("Player not found:", playerName)
+	end
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+	player.Chatted:Connect(function(message)
+		local parts = string.split(message, " ")
+		if #parts >= 3 and parts[1] == "/tp" then
+			local playerName = parts[2]
+			local partName = parts[3]
+			local isAdmin = table.find(adminUserIds, player.UserId)
+			if isAdmin then
+				teleportPlayerToPart(player, playerName, partName)
+			else
+				print("You are not authorized to use this command.")
+			end
+		end
+	end)
+end)
