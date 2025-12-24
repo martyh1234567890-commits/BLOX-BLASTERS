@@ -1,0 +1,12 @@
+--//Variables
+local plr = game:GetService("Players").LocalPlayer
+local REP = game:GetService("ReplicatedStorage")
+--//Connections
+REP.ClearChosen.OnClientEvent:Connect(function() 
+	REP.ClearChosen:FireServer() --I can just loop through players, but that's easier for me
+end)
+
+REP.AddImages.OnClientEvent:Connect(function(map, num)
+	plr.PlayerGui:WaitForChild("Map"..num).ViewportFrame:ClearAllChildren()
+	map:Clone().Parent = plr.PlayerGui:WaitForChild("Map"..num).ViewportFrame
+end)
