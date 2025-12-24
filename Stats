@@ -1,0 +1,70 @@
+local dataStores = game:GetService("DataStoreService"):GetDataStore("WinsDataStore")
+local defaultCash = 0
+local playersLeft = 0
+game.Players.PlayerAdded:Connect(function(player)
+	
+	playersLeft = playersLeft + 1
+	
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = "leaderstats"
+	leaderstats.Parent = player
+	
+	local wins = Instance.new("IntValue")
+	wins.Name = "Wins"
+	wins.Value = 0
+	wins.Parent = leaderstats
+	
+	
+	player.CharacterAdded:Connect(function(character)
+		character.Humanoid.WalkSpeed = 16
+	end)
+	
+	-- Data Stores
+	
+	local player_data
+	
+	pcall(function()
+		player_data = dataStores:GetAsync(player.UserId.."-Winss") -- 1736284-Bloodlust
+	end)
+	
+	if player_data ~= nil then
+		-- Player has saved data , load it in
+		wins.Value = player_data
+	else
+		-- New player
+		wins.Value = defaultCash
+	end
+	
+end)
+
+game.ReplicatedStorage.OnAllEggsFound.OnServerEvent:Connect(function(plr)
+	print("Yes")
+	local bgid = 2129718762
+	game:GetService("BadgeService"):AwardBadge(plr.userId, bgid)
+end)
+
+local bindableEvent = Instance.new("BindableEvent")
+
+game.Players.PlayerRemoving:Connect(function(player)
+	
+	pcall(function()
+		dataStores:SetAsync(player.UserId.."-Winss",player.leaderstats.Wins.Value)
+		print("Saved")
+		playersLeft = playersLeft - 1
+		bindableEvent:Fire()
+	end)
+	
+end)
+
+game:BindToClose(function()
+	-- This will be triggered upon shutdown
+	while playersLeft > 0 do
+		bindableEvent.Event:Wait()
+	end
+end)
+game:BindToClose(function()
+	for i,v in pairs(game:GetService("Players"):GetPlayers()) do --When game shuts down save
+		v:Kick("Saving data")
+	end
+	wait(2)
+end)
