@@ -1,0 +1,5 @@
+--//Player Joining
+game.Players.PlayerAdded:Connect(function(plr)
+	print("Player Joined")
+	game.ReplicatedStorage.PlayerJoinedRE:FireAllClients(plr.Name)
+end)
